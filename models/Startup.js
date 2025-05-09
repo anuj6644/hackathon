@@ -24,6 +24,10 @@ const startupSchema = new mongoose.Schema({
       'Please use a valid URL with HTTP or HTTPS'
     ]
   },
+   pitchDeck: {
+    url: String,
+    publicId: String
+  },
   createdAt: {
     type: Date,
     default: Date.now

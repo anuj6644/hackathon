@@ -1,6 +1,18 @@
 const express = require('express');
 const Startup = require('../models/Startup');
 const { protect } = require('../middleware/auth');
+const multer = require('multer');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+const upload = multer({ storage });
 const router = express.Router();
 
 // Get all startups
@@ -23,5 +35,33 @@ router.post('/', protect, async (req, res) => {
     res.status(400).json({ success: false, error: err.message });
   }
 });
+
+// Add pitch deck to startup
+router.post(
+  '/:id/pitch-deck',
+  protect,
+  upload.single('pitchDeck'),
+  async (req, res) => {
+    try {
+      const startup = await Startup.findById(req.params.id);
+      
+      // Delete old file if exists
+      if (startup.pitchDeck?.publicId) {
+        await cloudinary.uploader.destroy(startup.pitchDeck.publicId);
+      }
+
+      startup.pitchDeck = {
+        url: req.file.path,
+        publicId: req.file.filename
+      };
+      
+      await startup.save();
+      res.json({ success: true, data: startup });
+    } catch (err) {
+      res.status(400).json({ success: false, error: err.message });
+    }
+  }
+);
+
 
 module.exports = router;
