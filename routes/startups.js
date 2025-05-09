@@ -1,6 +1,6 @@
 const express = require('express');
 const Startup = require('../models/Startup');
-const { protect } = require('../middleware/auth');
+const { protect, authorizeStartupOwner } = require('../middleware/auth');
 const multer = require('multer');
 
 // Configure multer for file uploads
@@ -40,6 +40,7 @@ router.post('/', protect, async (req, res) => {
 router.post(
   '/:id/pitch-deck',
   protect,
+  authorizeStartupOwner,
   upload.single('pitchDeck'),
   async (req, res) => {
     try {

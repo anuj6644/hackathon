@@ -20,3 +20,15 @@ exports.protect = async (req, res, next) => {
     res.status(401).json({ success: false, error: 'Not authorized' });
   }
 };
+
+exports.authorizeStartupOwner = async (req, res, next) => {
+  const startup = await Startup.findById(req.params.id);
+  if (startup.user.toString() !== req.user.id) {
+    return res.status(403).json({ 
+      success: false, 
+      error: 'Not authorized to modify this resource' 
+    });
+  }
+  next();
+};
+
