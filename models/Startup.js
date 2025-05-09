@@ -39,4 +39,21 @@ const startupSchema = new mongoose.Schema({
   }
 });
 
+startupSchema.index({ 
+  name: 'text', 
+  description: 'text', 
+  industry: 'text' 
+});
+
+// Add this method
+startupSchema.statics.search = function(query) {
+  return this.find({
+    $text: { $search: query }
+  }, {
+    score: { $meta: "textScore" }
+  }).sort({
+    score: { $meta: "textScore" }
+  });
+};
+
 module.exports = mongoose.model('Startup', startupSchema);
