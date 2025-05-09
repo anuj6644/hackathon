@@ -17,6 +17,12 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 
+// Add after other route imports
+const startupRoutes = require('./routes/startups');
+
+// Add after other middleware
+app.use('/api/startups', startupRoutes);
+
 // Test route
 app.get('/', (req, res) => {
   res.send('Backend is running!');
